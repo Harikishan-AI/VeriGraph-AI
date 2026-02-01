@@ -24,26 +24,27 @@ The system operates as a directed graph where:
 
 ```mermaid
 graph TD
-    Start((__start__)) --> Supervisor(supervisor)
+    Start((Start)) --> Supervisor(Supervisor)
     
-    Supervisor -.-> LLM(llm)
-    Supervisor -.-> RAG(rag)
-    Supervisor -.-> WebScraper(web_scraper)
+    Supervisor -.-> LLM(LLM)
+    Supervisor -.-> RAG(RAG)
+    Supervisor -.-> WebScraper(Web Scraper)
     
-    LLM --> Validator(validator)
-    RAG --> Validator(validator)
-    WebScraper --> Validator(validator)
+    LLM --> Validator(Validator)
+    RAG --> Validator(Validator)
+    WebScraper --> Validator(Validator)
     
-    Validator -.->|invalid| Supervisor
-    Validator -.->|valid| End((__end__))
+    Validator -.->|Invalid| Supervisor
+    Validator -.->|Valid| End((End))
     
-    style Start fill:#d8b4fe,stroke:#a855f7,stroke-width:2px
-    style Supervisor fill:#f3e8ff,stroke:#a855f7,stroke-width:2px
-    style LLM fill:#f3e8ff,stroke:#a855f7,stroke-width:2px
-    style RAG fill:#f3e8ff,stroke:#a855f7,stroke-width:2px
-    style WebScraper fill:#f3e8ff,stroke:#a855f7,stroke-width:2px
-    style Validator fill:#f3e8ff,stroke:#a855f7,stroke-width:2px
-    style End fill:#d8b4fe,stroke:#a855f7,stroke-width:2px
+    %% Styling with explicit black text for high contrast
+    style Start fill:#d1c4e9,stroke:#512da8,stroke-width:2px,color:#000000
+    style Supervisor fill:#bbdefb,stroke:#0d47a1,stroke-width:2px,color:#000000
+    style LLM fill:#c8e6c9,stroke:#1b5e20,stroke-width:2px,color:#000000
+    style RAG fill:#c8e6c9,stroke:#1b5e20,stroke-width:2px,color:#000000
+    style WebScraper fill:#c8e6c9,stroke:#1b5e20,stroke-width:2px,color:#000000
+    style Validator fill:#ffccbc,stroke:#bf360c,stroke-width:2px,color:#000000
+    style End fill:#d1c4e9,stroke:#512da8,stroke-width:2px,color:#000000
 ```
 
 ## 🛠️ Prerequisites
