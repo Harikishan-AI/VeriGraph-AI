@@ -88,35 +88,53 @@ graph TD
 
 ## 🚀 Usage
 
-1.  **Navigate to the Code Directory**
-    ```bash
-    cd code
-    ```
+Run the Streamlit application locally from the repository root:
 
-2.  **Launch Jupyter Notebook**
-    ```bash
-    jupyter notebook
-    ```
+```bash
+streamlit run main.py
+```
 
-3.  **Run the Workflow**
-    Open `index_updated.ipynb`. Run all cells to initialize the graph.
-    
-    You can test the agent with queries like:
-    - *"What is the capital of France?"* (LLM)
-    - *"Tell me about the US GDP in 2024."* (RAG - requires `data/usa.txt`)
-    - *"What is the current stock price of Apple?"* (Web Scraper)
+The workflow is implemented in `code/workflow.py` and its prompt templates are in
+`code/prompts.py`. The production application runs from `main.py`; notebooks are
+not required for deployment.
 
-    ```python
-    # Example invocation in the notebook
-    app.invoke({"messages": ["What is the current inflation rate in the US?"]})
-    ```
+## 🐳 Docker and Kubernetes deployment
+
+The repository includes a Docker image that starts the Streamlit app on port `8501`.
+
+Build and run it locally:
+
+```bash
+docker build -t verigraph-ai:latest .
+docker run --rm -p 8501:8501 \
+    -e GROQ_API_KEY=your_groq_api_key \
+    -e TAVILY_API_KEY=your_tavily_api_key \
+    verigraph-ai:latest
+```
+
+On a single-node Kubernetes VM, build the image on the VM (or push it to a registry and update `image` in `kubernetes.yaml`), then create the secret and deploy:
+
+```bash
+kubectl create secret generic verigraph-ai-secrets \
+    --from-literal=GROQ_API_KEY='your_groq_api_key' \
+    --from-literal=TAVILY_API_KEY='your_tavily_api_key' \
+    --from-literal=HUGGINGFACE_API_KEY='your_huggingface_api_key' \
+    --from-literal=LANGCHAIN_API_KEY='your_langchain_api_key'
+kubectl apply -f kubernetes.yaml
+kubectl get pods -l app=verigraph-ai
+```
+
+Open `http://<VM_PUBLIC_IP>:30851`. The VM firewall/security group must allow inbound TCP port `30851`.
 
 ## 📂 Project Structure
 
 ```
 verigraph-ai/
+├── main.py                 # Streamlit entry point
 ├── code/
-│   └── index_updated.ipynb   # Main workflow definition and logic
+│   ├── workflow.py         # LangGraph workflow
+│   ├── prompts.py          # Prompt templates
+│   └── __init__.py          # Application package marker
 ├── data/
 │   └── usa.txt               # Knowledge base for RAG
 ├── pyproject.toml            # Project dependencies

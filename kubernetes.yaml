@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: verigraph-ai
+  labels:
+    app: verigraph-ai
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: verigraph-ai
+  template:
+    metadata:
+      labels:
+        app: verigraph-ai
+    spec:
+      containers:
+        - name: verigraph-ai
+          image: verigraph-ai:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8501
+          env:
+            - name: GROQ_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: verigraph-ai-secrets
+                  key: GROQ_API_KEY
+            - name: TAVILY_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: verigraph-ai-secrets
+                  key: TAVILY_API_KEY
+            - name: HUGGINGFACE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: verigraph-ai-secrets
+                  key: HUGGINGFACE_API_KEY
+                  optional: true
+            - name: LANGCHAIN_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: verigraph-ai-secrets
+                  key: LANGCHAIN_API_KEY
+                  optional: true
+            - name: LANGCHAIN_TRACING_V2
+              value: "true"
+            - name: LANGCHAIN_PROJECT
+              value: "VeriGraph-AI"
+          readinessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 45
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "1Gi"
+            limits:
+              cpu: "2"
+              memory: "4Gi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: verigraph-ai
+spec:
+  type: NodePort
+  selector:
+    app: verigraph-ai
+  ports:
+    - name: http
+      port: 8501
+      targetPort: http
+      nodePort: 30851
